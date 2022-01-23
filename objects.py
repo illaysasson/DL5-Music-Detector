@@ -59,6 +59,10 @@ class Note(MusicalSymbol):
         self.relative_pos = self.calculate_relative_pos() # According to middle of staff, B
         self.pitch = self.calculate_pitch()
         self.duration = None
+
+    def draw(self, image):
+        image = cv2.rectangle(image, self.bbox.min_corner, self.bbox.max_corner, (0,0,0), -1)
+        image = cv2.putText(image, self.pitch, (self.bbox.min_corner[0] + 3, self.bbox.max_corner[1] - 3), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         
     def __str__(self):
         return str(self.pitch) + " Note: " + str(self.bbox)

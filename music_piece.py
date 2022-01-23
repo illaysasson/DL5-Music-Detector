@@ -10,6 +10,13 @@ class MusicPiece:
         staves_bbox, notes_bbox = self.dataset_file_into_bbox(data_path)
         self.staves: Staff = [Staff(bbox) for bbox in staves_bbox]
         self.notes: Note = self.create_notes(notes_bbox)
+            
+    def draw(self, img):
+        for staff in self.staves:
+            staff.draw(img)
+        
+        for note in self.notes:
+            note.draw(img)
 
     
     def dataset_file_into_bbox(self, data_path):
@@ -42,6 +49,8 @@ class MusicPiece:
                 notes_list.append(Note(note_bbox, self.staves, None, True))
             else:
                 notes_list.append(Note(note_bbox, self.staves, None, False))
+
+        return notes_list
 
     def __repr__(self):
         return str(self.notes)

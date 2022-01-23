@@ -7,7 +7,9 @@ test_img = cv2.imread(r'example_data\lg-2267728-aug-beethoven--page-2.png')
 test_data_path = r'example_data\lg-2267728-aug-beethoven--page-2.txt'
 
 piece = MusicPiece(test_img, test_data_path)
-print(piece.staves)
+piece.draw(test_img)
+u.show_image(test_img, 2)
+
 
 '''
 img = cv2.imread(r'example_data\lg-2267728-aug-beethoven--page-2.png')
