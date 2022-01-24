@@ -3,8 +3,8 @@ from music_piece import MusicPiece
 import cv2
 import utility as u
 
-test_img = cv2.imread(r'example_data\lg-2267728-aug-beethoven--page-2.png')
-test_data_path = r'example_data\lg-2267728-aug-beethoven--page-2.txt'
+test_img = cv2.imread(r'example_data\machine_data\ido.jpg')
+test_data_path = r'example_data\machine_data\ido_results.txt'
 
 piece = MusicPiece(test_img, test_data_path)
 piece.draw(test_img)
