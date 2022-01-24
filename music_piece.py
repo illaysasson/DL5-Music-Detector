@@ -25,7 +25,8 @@ class MusicPiece:
         list_line = line.split(' ')
         category_name = list_line[0].strip(":")
         category = constants.CATEGORIES.index(category_name)
-        coords = [int(x.strip(')\n') for x in list_line if x.strip(')\n').isnumeric())]
+        coords = [int(x.strip(')\n')) for x in list_line if x.strip(')\n').isnumeric()]
+        print(coords)
         left_x, top_y, width, height = coords
         x, y = round(left_x + width/2), round(top_y + height/2)
         bbox = BoundingBox(category, x, y, width, height, self.img_width, self.img_height)
@@ -42,8 +43,8 @@ class MusicPiece:
             for line in file:
                 line_count += 1
 
-                if line_count >= 10:
-                    bbox: BoundingBox = self.machine_file_into_bbox(line)
+                if line_count > 10: # Actual detection starts from line 11
+                    bbox: BoundingBox = self.machine_line_into_bbox(line)
                     
                     if constants.CATEGORIES[bbox.category] == 'staff':
                         staves_bbox.append(bbox)
