@@ -16,7 +16,7 @@ class Object:
         return str(self)
 
     def draw(self, image):
-        image = cv2.rectangle(image, self.bbox.min_corner, self.bbox.max_corner, (0,0,255), 4)
+        image = cv2.rectangle(image, self.bbox.min_corner, self.bbox.max_corner, (255,0,255), 4)
 
 class Staff(Object):
     def __init__(self, bbox):
@@ -52,47 +52,63 @@ class Clef(MusicalSymbol):
         self.name = name
 
 class Note(MusicalSymbol):
-    def __init__(self, bbox, staves, clef, is_line_note):
+    def __init__(self, bbox, staves, clef, is_line_note, note_deviation):
         super().__init__(bbox, staves)
         self.clef: Clef = clef
         self.is_line_note = is_line_note
-        self.relative_pos = self.calculate_relative_pos() # According to middle of staff, B
+        self.relative_pos = self.calculate_relative_pos(note_deviation) # According to middle of staff, B
         self.pitch = self.calculate_pitch()
-        self.duration = None
+        self.duration = self.calculate_duration()
 
     def draw(self, image):
-        image = cv2.rectangle(image, self.bbox.min_corner, self.bbox.max_corner, (0,0,0), -1)
-        image = cv2.putText(image, self.pitch, (self.bbox.min_corner[0] + 3, self.bbox.max_corner[1] - 3), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        image = cv2.rectangle(image, self.bbox.min_corner, self.bbox.max_corner, (0,255,0), 2)
+        image = cv2.putText(image, self.pitch, (self.bbox.max_corner[0], self.bbox.min_corner[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 7)
+        image = cv2.putText(image, self.pitch, (self.bbox.max_corner[0], self.bbox.min_corner[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         
     def __str__(self):
-        return str(self.pitch) + " Note: " + str(self.bbox)
+        return str(self.pitch) #+ " Note: " + str(self.bbox)
 
-    def calculate_relative_pos(self):
+    def calculate_relative_pos(self, note_deviation):
         if self.is_line_note:
-            for i in range(0, 3):
+            for i in range(0, 5): # change to 2 for only in staff
                 # Going up
                 line = self.staff.middle - self.staff.line_height * i
-                if (line - constants.DEVIATION) < self.bbox.y < (line + constants.DEVIATION):
+                if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return i * 2
                 
                 # Going down
                 line = self.staff.middle - self.staff.line_height * -i
-                if (line - constants.DEVIATION) < self.bbox.y < (line + constants.DEVIATION):
+                if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return -i * 2
         else:
-            for i in range(0, 2):
+            for i in range(0, 5): # change to 3 for only in staff
                 # Going up
                 line = self.staff.middle - self.staff.line_height * i - round(self.staff.line_height/2)
-                if (line - constants.DEVIATION) < self.bbox.y < (line + constants.DEVIATION):
+                if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return 1 + i*2 
                 
                 # Going down
                 line = self.staff.middle - self.staff.line_height * -i + round(self.staff.line_height/2)
-                if (line - constants.DEVIATION) < self.bbox.y < (line + constants.DEVIATION):
+                if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return -1 - i*2
         return None
 
     def calculate_pitch(self):
         if self.relative_pos is not None:
-            return constants.NOTES[self.relative_pos % 7] 
+            note_index = self.relative_pos % 7 - 1 # -1 because notes list starts with C, but when relative_pos=0 the note is B.
+            octave_number = 5 + (self.relative_pos-1) // 7 # middle of the staff B4
+
+            return constants.NOTES[note_index] + str(octave_number)
         return None
+
+    def calculate_duration(self):
+        category = constants.CATEGORIES[self.bbox.category]
+
+        if self.pitch == None: # If not is not recognized, then 0
+            return 0
+        elif 'Half' in category:
+            return 2
+        elif 'Whole' in category:
+            return 4
+        else:
+            return 1

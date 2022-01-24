@@ -1,3 +1,2 @@
-DEVIATION = 7
-NOTES = ['B', 'C', 'D', 'E', 'F', 'G', 'A']
+NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 CATEGORIES = ["staff", "noteheadBlackOnLine", "noteheadBlackInSpace", "noteheadHalfOnLine", "noteheadHalfInSpace", "noteheadWholeOnLine", "noteheadWholeInSpace"]
