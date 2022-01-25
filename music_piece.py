@@ -5,7 +5,9 @@ import constants
 import utility as u
 
 class MusicPiece:
-    def __init__(self, img, data_path, note_deviation, is_from_machine=True):
+    def __init__(self, img, data_path, mode, note_deviation, is_from_machine=True):
+        self.mode = mode
+
         self.note_deviation = note_deviation # for note calculations
 
         self.img = img
@@ -30,27 +32,61 @@ class MusicPiece:
         degrees = []
         duration = []
 
-        for notes_list in self.notes:
-            for note in notes_list:
+        for notes_lists in self.notes:
+            for note in notes_lists:
                 if note.pitch is not None or note.duration != 0: # Only notes that have pitch and duration
                     degrees.append(u.note_to_midi(note.pitch))
                     duration.append(note.duration)
 
         return degrees, duration
 
-    def create_midi(self, volume, tempo):        
+    def seperate_notes_to_degrees_and_duration(self):
+        degrees = []
+        durations = []
+
+        for notes_list in self.notes:
+            staff_durations = []
+            staff_degrees = []
+            for note in notes_list:
+                if note.pitch is not None or note.duration != 0: # Only notes that have pitch and duration
+                    staff_degrees.append(u.note_to_midi(note.pitch))
+                    staff_durations.append(note.duration)
+            degrees.append(staff_degrees)
+            durations.append(staff_durations)
+
+        return degrees, durations
+
+
+    def create_midi(self, volume, tempo):
         track = 0
         channel = 0
         time = 1 # In beats
-        
-        degrees, durations = self.notes_to_degrees_and_duration() # degrees: MIDI note number, duration: In beats
-        
+
         MyMIDI = MIDIFile(1)
         MyMIDI.addTempo(track, time, tempo)
+        
+        if self.mode == 0: # Normal
+            degrees, durations = self.notes_to_degrees_and_duration() # degrees: MIDI note number, duration: In beats
 
-        for i, pitch in enumerate(degrees):
-            MyMIDI.addNote(track, channel, pitch, time, durations[i], volume)
-            time = time + durations[i]
+            for i, pitch in enumerate(degrees):
+                MyMIDI.addNote(track, channel, pitch, time, durations[i], volume)
+                time = time + durations[i]
+        elif self.mode == 1: # Piano
+            degrees, durations = self.seperate_notes_to_degrees_and_duration()
+            time_treble = 1
+            time_bass = 1
+
+            for staff_num in range(len(degrees)): # Goes through every staff
+                if staff_num % 2 == 0: # Treble clef
+                    for i in range(len(degrees[staff_num])):
+                        MyMIDI.addNote(track, channel, degrees[staff_num][i], time_treble, durations[staff_num][i], volume)
+                        time_treble = time_treble + durations[staff_num][i]
+                else: # Bass clef
+                    for i in range(len(degrees[staff_num])):
+                        MyMIDI.addNote(track, channel, degrees[staff_num][i], time_bass, durations[staff_num][i], volume)
+                        time_bass = time_bass + durations[staff_num][i]
+        else:
+            return
 
         with open("song.mid", "wb") as output_file:
             MyMIDI.writeFile(output_file)
@@ -120,30 +156,40 @@ class MusicPiece:
         for note_bbox in notes_bbox:
             category = note_bbox.category
             if 'Line' in constants.CATEGORIES[category]: # Later add the option for other classes and make this a general function
-                notes_list_unordered.append(Note(note_bbox, self.staves, None, True, self.note_deviation))
+                notes_list_unordered.append(Note(note_bbox, self.staves, 'Treble', True, self.note_deviation))
             else:
-                notes_list_unordered.append(Note(note_bbox, self.staves, None, False, self.note_deviation))
+                notes_list_unordered.append(Note(note_bbox, self.staves, 'Treble', False, self.note_deviation))
 
         # I can be efficent and put everything into one loop, but im lazy
 
         notes_list = []
+
+        bass_counter = 1 # For piano mode, every even staff is a bass clef
 
         for staff in self.staves:
             notes_in_staff = []
 
             for note in notes_list_unordered:
                 if note.staff == staff:
+                    if bass_counter % 2 == 0 and self.mode==1:
+                        note.set_clef('Bass')
                     notes_in_staff.append(note)
             
             notes_in_staff.sort(key=lambda n: n.bbox.x) # sort by who's first
-
             notes_list.append(notes_in_staff)
+
+            bass_counter += 1
 
         return notes_list
 
     # To add for chords - Sort by first x, every note is a chord = a list of close notes ([A4 C4] or just [A4] if alone)
-    def sort_notes(self, notes):
-        pass
+    def group_close_notes(self, notes):
+        new_notes = []
+
+        for note in notes:
+            if note == notes[0]: # Skips the first one
+                continue
+            
 
     def __repr__(self):
         return str(self.notes)

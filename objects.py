@@ -45,16 +45,10 @@ class MusicalSymbol(Object):
 
         return staves[min_index]
 
-
-class Clef(MusicalSymbol):
-    def __init__(self, bbox, staff, name):
-        super().__init__(bbox, staff)
-        self.name = name
-
 class Note(MusicalSymbol):
     def __init__(self, bbox, staves, clef, is_line_note, note_deviation):
         super().__init__(bbox, staves)
-        self.clef: Clef = clef
+        self.clef = clef # Treble or Bass
         self.is_line_note = is_line_note
         self.relative_pos = self.calculate_relative_pos(note_deviation) # According to middle of staff, B
         self.pitch = self.calculate_pitch()
@@ -93,10 +87,18 @@ class Note(MusicalSymbol):
                     return -1 - i*2
         return None
 
+    def set_clef(self, clef):
+        self.clef = clef
+        self.pitch = self.calculate_pitch()
+
     def calculate_pitch(self):
         if self.relative_pos is not None:
-            note_index = self.relative_pos % 7 - 1 # -1 because notes list starts with C, but when relative_pos=0 the note is B.
-            octave_number = 5 + (self.relative_pos-1) // 7 # middle of the staff B4
+            if self.clef == 'Bass': # bass clef
+                note_index = self.relative_pos % 7 - 6 # -1 because notes list starts with C, but when relative_pos=0 the note is B.
+                octave_number = 4 + (self.relative_pos-6) // 7 # middle of the staff B4
+            else: # treble clef is default
+                note_index = self.relative_pos % 7 - 1 # -1 because notes list starts with C, but when relative_pos=0 the note is B.
+                octave_number = 5 + (self.relative_pos-1) // 7 # middle of the staff B4
 
             return constants.NOTES[note_index] + str(octave_number)
         return None
