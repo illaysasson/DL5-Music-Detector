@@ -65,28 +65,11 @@ class MusicPiece:
         MyMIDI = MIDIFile(1)
         MyMIDI.addTempo(track, time, tempo)
         
-        if self.mode == 0: # Normal
-            degrees, durations = self.notes_to_degrees_and_duration() # degrees: MIDI note number, duration: In beats
+        degrees, durations = self.notes_to_degrees_and_duration() # degrees: MIDI note number, duration: In beats
 
-            for i, pitch in enumerate(degrees):
-                MyMIDI.addNote(track, channel, pitch, time, durations[i], volume)
-                time = time + durations[i]
-        elif self.mode == 1: # Piano
-            degrees, durations = self.seperate_notes_to_degrees_and_duration()
-            time_treble = 1
-            time_bass = 1
-
-            for staff_num in range(len(degrees)): # Goes through every staff
-                if staff_num % 2 == 0: # Treble clef
-                    for i in range(len(degrees[staff_num])):
-                        MyMIDI.addNote(track, channel, degrees[staff_num][i], time_treble, durations[staff_num][i], volume)
-                        time_treble = time_treble + durations[staff_num][i]
-                else: # Bass clef
-                    for i in range(len(degrees[staff_num])):
-                        MyMIDI.addNote(track, channel, degrees[staff_num][i], time_bass, durations[staff_num][i], volume)
-                        time_bass = time_bass + durations[staff_num][i]
-        else:
-            return
+        for i, pitch in enumerate(degrees):
+            MyMIDI.addNote(track, channel, pitch, time, durations[i], volume)
+            time = time + durations[i]
 
         with open("song.mid", "wb") as output_file:
             MyMIDI.writeFile(output_file)
