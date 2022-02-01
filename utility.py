@@ -1,8 +1,8 @@
 import cv2
 
-def show_image(img, resize=None):
-    if resize is not None:
-        img = cv2.resize(img, resize)
+def show_image(img, img_size=None, multiplier=1):
+    if img_size is not None:
+        img = cv2.resize(img, (int(img_size[0]*multiplier), int(img_size[1]*multiplier)))
     cv2.imshow('image', img)
     cv2.waitKey(0) 
     cv2.destroyAllWindows()

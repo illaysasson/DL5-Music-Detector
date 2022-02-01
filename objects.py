@@ -23,8 +23,8 @@ class Staff(Object):
         super().__init__(bbox)
         self.line_height = round(self.bbox.height / 4)
 
-        self.bottom = self.bbox.max_corner[1]
-        #self.middle = self.bottom - self.line_height * 2 # middle B, can be replaced wit just bbox.y but this is more accurate
+        bottom = self.bbox.max_corner[1]
+        self.middle = bottom - self.line_height * 2 # middle B, can be replaced wit just bbox.y but this is more accurate
     
     def __str__(self):
         return "Staff: " + str(self.bbox)
@@ -64,43 +64,41 @@ class Note(MusicalSymbol):
 
     def calculate_relative_pos(self, note_deviation):
         if self.is_line_note:
-            for i in range(0, 6):
+            for i in range(0, 5): # change to 2 for only in staff
                 # Going up
-                line = self.staff.bottom - self.staff.line_height * i
+                line = self.staff.middle - self.staff.line_height * i
                 if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return i * 2
                 
                 # Going down
-                if i <= 6: # Stops after a certain point
-                    line = self.staff.bottom + self.staff.line_height * i
-                    if (line - note_deviation) < self.bbox.y < (line + note_deviation):
-                        return -i * 2
+                line = self.staff.middle - self.staff.line_height * -i
+                if (line - note_deviation) < self.bbox.y < (line + note_deviation):
+                    return -i * 2
         else:
-            for i in range(0, 5): 
+            for i in range(0, 5): # change to 3 for only in staff
                 # Going up
-                line = self.staff.bottom - self.staff.line_height * i - round(self.staff.line_height/2)
-                if (line - note_deviation) < self.bbox.y < (line + note_deviation) or (line - note_deviation) < self.bbox.y < (line + note_deviation):
+                line = self.staff.middle - self.staff.line_height * i - round(self.staff.line_height/2)
+                if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return 1 + i*2 
                 
                 # Going down
-                if i <= 5: # Stops after a certain point
-                    line = self.staff.bottom + self.staff.line_height *i + round(self.staff.line_height/2)
-                    if (line - note_deviation) < self.bbox.y < (line + note_deviation):
-                        return -1 - i*2
+                line = self.staff.middle - self.staff.line_height * -i + round(self.staff.line_height/2)
+                if (line - note_deviation) < self.bbox.y < (line + note_deviation):
+                    return -1 - i*2
         return None
 
     def set_clef(self, clef):
         self.clef = clef
         self.pitch = self.calculate_pitch()
-
+    
     def calculate_pitch(self):
         if self.relative_pos is not None:
             if self.clef == 'Bass': # bass clef
-                note_index = (self.relative_pos+4) % 7 # +4 because notes list starts with C, but when relative_pos=0 the note is G.
-                octave_number = 2 + (self.relative_pos+4) // 7 # bottom of staff G2
+                note_index = self.relative_pos % 7 - 6 # -1 because notes list starts with C, but when relative_pos=0 the note is B.
+                octave_number = 4 + (self.relative_pos-6) // 7 # middle of the staff B4
             else: # treble clef is default
-                note_index = (self.relative_pos+2) % 7 # +2 because notes list starts with C, but when relative_pos=0 the note is E.
-                octave_number = 4 + (self.relative_pos+2) // 7 # bottom of staff E4
+                note_index = self.relative_pos % 7 - 1 # -1 because notes list starts with C, but when relative_pos=0 the note is B.
+                octave_number = 5 + (self.relative_pos-1) // 7 # middle of the staff D3
 
             return constants.NOTES[note_index] + str(octave_number)
         return None
