@@ -1,7 +1,7 @@
 import cv2
 from bounding_box import BoundingBox
 import constants
-import utility as u
+import utils as u
 
 
 # ======================================================== BASE CLASSES ========================================================

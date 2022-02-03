@@ -1,18 +1,21 @@
 from music_piece import MusicPiece
 import cv2
-import utility as u
+import utils as u
 import constants
-import os
+import tensorflow as tf
+from tensorflow.python.saved_model import tag_constants
 
-test_img = cv2.imread(r'example_data\machine_data\jonathan.jpg')
-test_data_path = r'example_data\machine_data\jonathan_results.txt'
+img = cv2.imread(r'data\idobig.jpg')
+# Needs resizing tiny images into jonathan size
 
-piece = MusicPiece(test_img, test_data_path, mode=0, note_deviation=15)
+model = tf.saved_model.load('data\yolov3-704', tags=[tag_constants.SERVING])
+print('Model Loaded!')
+piece = MusicPiece(img, model, mode=0, note_deviation=15)
 # Mode 0 - Default: Just Treble clef
 # Mode 1 - Piano: Treble & Bass clef
 # Mode 2 - Orchestra: Just Treble but everything at once - TBA
 
-piece.draw(test_img)
-u.show_image(test_img, constants.WIN_SIZE, 1.5)
+piece.draw(img)
+u.show_image(img, constants.WIN_SIZE, 1.5)
 
 piece.create_midi(100, 120)
