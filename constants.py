@@ -1,3 +1,5 @@
+import cv2
+
 WIN_SIZE = (712, 990)
 INPUT_SIZE = 704
 
@@ -6,3 +8,5 @@ CATEGORIES = ["staff", "noteheadBlackOnLine", "noteheadBlackInSpace", "noteheadH
 
 MAX_OUTPUT_SIZE_PER_CLASS = 100 # For predictions
 MAX_TOTAL_SIZE = 200 # For predictions
+
+IMG_TEMPLATE = cv2.imread(r'data\template.jpg')

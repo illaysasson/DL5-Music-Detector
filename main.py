@@ -5,11 +5,9 @@ import constants
 import tensorflow as tf
 from tensorflow.python.saved_model import tag_constants
 
-img = cv2.imread(r'data\idobig.jpg')
-# Needs resizing tiny images into jonathan size
+img = cv2.imread(r'data\ido.jpg')
 
 model = tf.saved_model.load('data\yolov3-704', tags=[tag_constants.SERVING])
-print('Model Loaded!')
 piece = MusicPiece(img, model, mode=0, note_deviation=15)
 # Mode 0 - Default: Just Treble clef
 # Mode 1 - Piano: Treble & Bass clef
