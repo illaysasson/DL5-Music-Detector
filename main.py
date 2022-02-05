@@ -5,7 +5,11 @@ import constants
 import tensorflow as tf
 from tensorflow.python.saved_model import tag_constants
 
-img = cv2.imread(r'data\ido.jpg')
+img = cv2.imread(r'data\jonathan.jpg')
+if img.shape[0] > constants.INPUT_SIZE or img.shape[1] > constants.INPUT_SIZE:
+    img = u.paste_on_template(img)
+else:
+    img = img
 
 model = tf.saved_model.load('data\yolov3-704', tags=[tag_constants.SERVING])
 piece = MusicPiece(img, model, mode=0, note_deviation=15)

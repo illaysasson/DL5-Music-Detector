@@ -14,14 +14,9 @@ def show_image(img, img_size=None, multiplier=1):
 
 def predict(model, image):
     # Pastes small images on template
-    if image.shape[0] > constants.INPUT_SIZE or image.shape[1] > constants.INPUT_SIZE:
-        new_image = paste_on_template(image)
-    else:
-        new_image = image
-
     infer = model.signatures['serving_default']
 
-    image_data = cv2.resize(new_image, (constants.INPUT_SIZE, constants.INPUT_SIZE))
+    image_data = cv2.resize(image, (constants.INPUT_SIZE, constants.INPUT_SIZE))
     image_data = image_data / 255.
 
     images_data = []
@@ -44,7 +39,7 @@ def predict(model, image):
     score_threshold=0.25
 
     boxes, scores, classes, valid_detections = tf.image.combined_non_max_suppression(boxes, scores, max_output_size_per_class, max_total_size, iou_threshold, score_threshold)
-    image_h, image_w, _ = new_image.shape
+    image_h, image_w, _ = image.shape
     pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
     out_boxes = pred_bbox[0]
 
