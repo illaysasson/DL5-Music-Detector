@@ -17,7 +17,7 @@ piece = MusicPiece(img, model, mode=0, note_deviation=15)
 # Mode 1 - Piano: Treble & Bass clef
 # Mode 2 - Orchestra: Just Treble but everything at once - TBA
 
+piece.create_midi(100, 120)
+
 piece.draw(img)
 u.show_image(img, constants.WIN_SIZE, 1.5)
-
-piece.create_midi(100, 120)
