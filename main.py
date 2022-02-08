@@ -1,7 +1,7 @@
 from music_piece import MusicPiece
 import cv2
 import utils as u
-import constants
+import constants # import specific stuff
 import tensorflow as tf
 from tensorflow.python.saved_model import tag_constants
 

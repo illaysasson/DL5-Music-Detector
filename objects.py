@@ -21,7 +21,7 @@ class Object:
 class Staff(Object):
     def __init__(self, bbox):
         super().__init__(bbox)
-        self.line_height = round(self.bbox.height / 4)
+        self.line_height = self.bbox.height // 4
 
         bottom = self.bbox.max_corner[1]
         self.middle = bottom - self.line_height * 2 # middle B, can be replaced wit just bbox.y but this is more accurate
@@ -77,12 +77,12 @@ class Note(MusicalSymbol):
         else:
             for i in range(0, 5): # change to 3 for only in staff
                 # Going up
-                line = self.staff.middle - self.staff.line_height * i - round(self.staff.line_height/2)
+                line = self.staff.middle - self.staff.line_height * i - self.staff.line_height//2
                 if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return 1 + i*2 
                 
                 # Going down
-                line = self.staff.middle - self.staff.line_height * -i + round(self.staff.line_height/2)
+                line = self.staff.middle - self.staff.line_height * -i + self.staff.line_height//2
                 if (line - note_deviation) < self.bbox.y < (line + note_deviation):
                     return -1 - i*2
         return None
