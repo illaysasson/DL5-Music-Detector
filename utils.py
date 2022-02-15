@@ -1,8 +1,9 @@
 import cv2
-import constants
+from constants import INPUT_SIZE, MAX_TOTAL_SIZE, MAX_OUTPUT_SIZE_PER_CLASS, TEMPLATE_PATH
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.saved_model import tag_constants
+from PyQt5.QtGui import QPixmap, QImage
 from bounding_box import BoundingBox
 
 def show_image(img, img_size=None, multiplier=1):
@@ -16,7 +17,7 @@ def predict(model, image):
     # Pastes small images on template
     infer = model.signatures['serving_default']
 
-    image_data = cv2.resize(image, (constants.INPUT_SIZE, constants.INPUT_SIZE))
+    image_data = cv2.resize(image, (INPUT_SIZE, INPUT_SIZE))
     image_data = image_data / 255.
 
     images_data = []
@@ -33,8 +34,8 @@ def predict(model, image):
 
     boxes=tf.reshape(boxes, (tf.shape(boxes)[0], -1, 1, 4))
     scores=tf.reshape(pred_conf, (tf.shape(pred_conf)[0], -1, tf.shape(pred_conf)[-1]))
-    max_output_size_per_class=constants.MAX_OUTPUT_SIZE_PER_CLASS
-    max_total_size=constants.MAX_TOTAL_SIZE
+    max_output_size_per_class=MAX_OUTPUT_SIZE_PER_CLASS
+    max_total_size=MAX_TOTAL_SIZE
     iou_threshold=0.45
     score_threshold=0.25
 
@@ -63,7 +64,7 @@ def predict(model, image):
     return bboxes
 
 def paste_on_template(img):
-    new_img = constants.IMG_TEMPLATE
+    new_img = cv2.imread(TEMPLATE_PATH)
 
     if new_img.shape[1] < img.shape[1]:
         new_img = cv2.resize(new_img, (img.shape[1], new_img.shape[0]))
@@ -74,6 +75,16 @@ def paste_on_template(img):
 
     return new_img
 
+def convert_nparray_to_QPixmap(img):
+    w,h,ch = img.shape
+    # Convert resulting image to pixmap
+    if img.ndim == 1:
+        img =  cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
+
+    qimg = QImage(img.data, h, w, 3*h, QImage.Format_RGB888) 
+    qpixmap = QPixmap(qimg)
+
+    return qpixmap
 
 # Thanks to Fusion_Prog_Guy from StackOverflow! https://stackoverflow.com/questions/13926280/musical-note-string-c-4-f-3-etc-to-midi-note-value-in-python
 def note_to_midi(KeyOctave):
