@@ -5,9 +5,8 @@ from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import utils as u
 import cv2
-import os
+import pygame
 from constants import WIN_WIDTH, WIN_HEIGHT, MARGIN, TEMPLATE_PATH, BLOCKS_MARGIN
-from midi2audio import FluidSynth
 
 
 from music_piece import MusicPiece
@@ -21,6 +20,7 @@ class GUI(QMainWindow):
         self.note_deviation = 15
         self.mode = 0
         self.bpm = 120
+        self.playing = False
 
         super(GUI, self).__init__()
         self._init_UI()
@@ -93,12 +93,15 @@ class GUI(QMainWindow):
 
 
     def _play_midi_file(self):
-        full_file_path = os.path.join(os.getcwd(), 'song.wav')
-        url = QUrl.fromLocalFile(full_file_path)
-        content = QMediaContent(url)
+        pygame.init()
 
-        self.player.setMedia(content)
-        self.player.play()
+        if not self.playing:
+            self.playing = True
+            pygame.mixer.music.load("song.mid")
+            pygame.mixer.music.play()
+        else:
+            self.playing = False
+            pygame.mixer.music.stop()
 
     def _open_image_file(self):
         file_name, _ = QFileDialog.getOpenFileName(
