@@ -56,8 +56,8 @@ class Note(MusicalSymbol):
 
     def draw(self, image):
         image = cv2.rectangle(image, self.bbox.min_corner, self.bbox.max_corner, (0,255,0), 2)
-        image = cv2.putText(image, str(self.pitch), (self.bbox.max_corner[0], self.bbox.min_corner[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 7)
-        image = cv2.putText(image, str(self.pitch), (self.bbox.max_corner[0], self.bbox.min_corner[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        image = cv2.putText(image, str(self.pitch), (self.bbox.max_corner[0], self.bbox.min_corner[1]), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 7)
+        #image = cv2.putText(image, str(self.pitch), (self.bbox.max_corner[0], self.bbox.min_corner[1]), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1)
         
     def __str__(self):
         return str(self.pitch) #+ " Note: " + str(self.bbox)

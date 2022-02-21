@@ -4,7 +4,7 @@ from tensorflow.python.saved_model import tag_constants
 from PyQt5.QtWidgets import QApplication
 import sys
 
-model = tf.saved_model.load('data\yolov3-704', tags=[tag_constants.SERVING])
+model = tf.saved_model.load('assets\yolov3-704', tags=[tag_constants.SERVING])
 
 def window(m):
     app = QApplication(sys.argv)
