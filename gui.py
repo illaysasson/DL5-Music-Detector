@@ -133,8 +133,6 @@ class GUI(QMainWindow):
     def _open_image_file(self):
         file_name, _ = QFileDialog.getOpenFileName(
             self, 'Open Image File', "", "Image files (*.jpg *.jpeg *.png)")  # Path
-        # Remember to handle null strings if canceled midway
-        print(file_name)
         if file_name == '':
             return
         self.img = u.paste_on_template(cv2.imread(file_name))
