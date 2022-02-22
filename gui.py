@@ -68,7 +68,7 @@ class GUI(QMainWindow):
         settings_y = self.image_label.y() + MARGIN
         settings_width = BLOCKS_MARGIN*2 - MARGIN*2
         settings_height = 30
-        line_width = 90
+        line_width = (BLOCKS_MARGIN//2) - (MARGIN*2)
 
         self.settings_label = QLabel("Settings", self)
         self.settings_label.setGeometry(settings_x, settings_y, settings_width, settings_height)
