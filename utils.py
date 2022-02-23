@@ -65,12 +65,10 @@ def predict(model, image):
 
 def paste_on_template(img):
     new_img = cv2.imread(TEMPLATE_PATH)
+    original_height, original_width, _ = img.shape
+    resize_factor = new_img.shape[1] / original_width
 
-    if new_img.shape[1] < img.shape[1]:
-        new_img = cv2.resize(new_img, (img.shape[1], new_img.shape[0]))
-
-    resize_factor = new_img.shape[1] / img.shape[1]
-    img = cv2.resize(img, (new_img.shape[1], round(img.shape[0] * resize_factor)))
+    img = cv2.resize(img, (new_img.shape[1], round(original_height * resize_factor)))
     new_img[0:img.shape[0], 0:img.shape[1]] = img
 
     return new_img
