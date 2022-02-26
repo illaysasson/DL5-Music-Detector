@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QPushButton, QLabel, QLineEdit
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QFont, QIcon
 from PyQt5.QtCore import Qt
 import utils as u
@@ -8,6 +8,7 @@ import cv2
 import pygame
 import os
 import webbrowser
+import shutil
 from constants import WIN_WIDTH, WIN_HEIGHT, MARGIN, TEMPLATE_PATH, BLOCKS_MARGIN, DEFAULT_FONT
 
 
@@ -97,15 +98,20 @@ class GUI(QMainWindow):
         self.tempo_line.setText('120')
         self.tempo_line.setGeometry(self.tempo_label.x() + self.tempo_label.width() + MARGIN, self.tempo_label.y(), line_width, self.tempo_label.height())
 
+        self.analyze_button = QPushButton("Analzye", self)
+        self.analyze_button.setGeometry(settings_x, self.image_label.height() - MARGIN*3 - settings_height*3, settings_width, settings_height)
+        self.analyze_button.setFont(QFont(DEFAULT_FONT, 12))
+        self.analyze_button.clicked.connect(self._analyze_image)
+
         self.play_button = QPushButton("Play", self)
-        self.play_button.setGeometry(settings_x, self.image_label.height() - MARGIN - settings_height, settings_width, settings_height)
+        self.play_button.setGeometry(settings_x, self.image_label.height() - MARGIN*2 - settings_height*2, settings_width, settings_height)
         self.play_button.setFont(QFont(DEFAULT_FONT, 12))
         self.play_button.clicked.connect(self._play_midi_file)
 
-        self.analyze_button = QPushButton("Analzye", self)
-        self.analyze_button.setGeometry(settings_x, self.image_label.height() - MARGIN*2 - settings_height*2, settings_width, settings_height)
-        self.analyze_button.setFont(QFont(DEFAULT_FONT, 12))
-        self.analyze_button.clicked.connect(self._analyze_image)
+        self.save_button = QPushButton("Save", self)
+        self.save_button.setGeometry(settings_x, self.image_label.height() - MARGIN - settings_height, settings_width, settings_height)
+        self.save_button.setFont(QFont(DEFAULT_FONT, 12))
+        self.save_button.clicked.connect(self._save_midi)
 
     def _analyze_image(self):
         piece = MusicPiece(self.img, self.model, 0, int(self.mode_line.text()))
@@ -120,6 +126,9 @@ class GUI(QMainWindow):
 
 
     def _play_midi_file(self):
+        if not os.path.isfile('song.mid'):
+            return
+
         pygame.init()
 
         if not self.playing:
@@ -140,6 +149,22 @@ class GUI(QMainWindow):
         img = QPixmap.scaledToHeight(img, WIN_HEIGHT - (6 * MARGIN))
         self.image_label.setPixmap(img)
         self.image_label.adjustSize()
+
+        if os.path.exists("song.mid"):
+            os.remove("song.mid")
+
+    def _save_midi(self):
+        if not os.path.isfile('song.mid'):
+            return
+
+        target_path, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'MIDI (*.mid)')  # Path
+        print(target_path)
+
+        if target_path == '':
+            return
+
+        #print(target_path, target_path + '\song.mid')
+        shutil.copyfile('song.mid', target_path)
 
     def _open_github(self):
         webbrowser.open('https://github.com/illaysasson/DL5-Music-Detector')
