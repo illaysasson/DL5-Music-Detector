@@ -2,7 +2,7 @@
 
 This application is able to predict and play simple* sheet music, using Deep Learning technology (YOLOV3) and PyQt for the interface.
 
-![](https://i.imgur.com/O2SO0r0.png)
+![](https://i.imgur.com/HLjsShy.png)
 
 ![](https://i.imgur.com/5AqYh1f.png)
 
