@@ -10,7 +10,8 @@ Simple, meaning:
 - Only in C Major (No key signatures)
 - Only one-handed playing (No bass clef)
 - No accidentals
-- Only quarter, half and whole notes.
+- Only quarter, half and whole notes
+- No chords
 Might get upgraded in the future :)
 
 This was done for my Final Project in Deep Learning (10 Units Computer Science).
