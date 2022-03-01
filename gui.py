@@ -14,7 +14,7 @@ from constants import WIN_WIDTH, WIN_HEIGHT, MARGIN, TEMPLATE_PATH, BLOCKS_MARGI
 
 from music_piece import MusicPiece
 
-
+# GUI Class
 class GUI(QMainWindow):
     def __init__(self, model):
         self.img = cv2.imread(TEMPLATE_PATH)
@@ -28,6 +28,7 @@ class GUI(QMainWindow):
         self.setFixedSize(WIN_WIDTH, WIN_HEIGHT)
         self.setWindowTitle("DL5 Music Detector")
 
+    # Inits the UI
     def _init_UI(self):
         self.image_label = QLabel(self)
 
@@ -40,6 +41,7 @@ class GUI(QMainWindow):
         self._create_buttons_and_icons()
         self._create_settings_window()
 
+    # Draws the squares surronding the image and settings
     def paintEvent(self, e):
         painter = QPainter(self)
         painter.setPen(QPen(Qt.black, 6, Qt.SolidLine))
@@ -48,6 +50,7 @@ class GUI(QMainWindow):
         painter.setPen(QPen(Qt.black, 3, Qt.SolidLine))
         painter.drawRect(self.image_label.x() + self.image_label.width() + BLOCKS_MARGIN, self.image_label.y(), BLOCKS_MARGIN*2, self.image_label.height()) # Settings Square
 
+    # Creates the upload button and the github icon
     def _create_buttons_and_icons(self):
         self.file_button = QPushButton("Upload Image", self)
 
@@ -64,6 +67,7 @@ class GUI(QMainWindow):
         self.github_button.setGeometry(self.image_label.x() - BLOCKS_MARGIN - github_icon_size, WIN_HEIGHT//2 - github_icon_size//2, github_icon_size, github_icon_size)
         self.github_button.clicked.connect(self._open_github)
 
+    # Create the settings window
     def _create_settings_window(self):
         settings_x = self.image_label.x() + self.image_label.width() + BLOCKS_MARGIN + MARGIN
         settings_y = self.image_label.y() + MARGIN
@@ -113,6 +117,7 @@ class GUI(QMainWindow):
         self.save_button.setFont(QFont(DEFAULT_FONT, 12))
         self.save_button.clicked.connect(self._save_midi)
 
+    # Analyzes the image and creates the midi file. This function is connected to the "Analyze" button
     def _analyze_image(self):
         piece = MusicPiece(self.img, self.model, 0, int(self.mode_line.text()))
         piece.create_midi(100, int(self.tempo_line.text()))
@@ -125,6 +130,7 @@ class GUI(QMainWindow):
         self.image_label.adjustSize()
 
 
+    # Plays or stops the midi file. This function is connected to the "Play" button
     def _play_midi_file(self):
         if not os.path.isfile('song.mid'):
             return
@@ -139,6 +145,7 @@ class GUI(QMainWindow):
             self.playing = False
             pygame.mixer.music.stop()
 
+    # Uploads an image to the GUI. This function is connected to the "Upload Image" button
     def _open_image_file(self):
         file_name, _ = QFileDialog.getOpenFileName(
             self, 'Open Image File', "", "Image files (*.jpg *.jpeg *.png)")  # Path
@@ -153,6 +160,7 @@ class GUI(QMainWindow):
         if os.path.exists("song.mid"):
             os.remove("song.mid")
 
+    # Saves the midi file in the user's computer. This function is connected to the "Save" button
     def _save_midi(self):
         if not os.path.isfile('song.mid'):
             return
@@ -166,6 +174,7 @@ class GUI(QMainWindow):
         #print(target_path, target_path + '\song.mid')
         shutil.copyfile('song.mid', target_path)
 
+    # Opens the repository in github. This function is connected to the Github icon
     def _open_github(self):
         webbrowser.open('https://github.com/illaysasson/DL5-Music-Detector')
 
@@ -174,4 +183,3 @@ class GUI(QMainWindow):
         super(QMainWindow, self).closeEvent(*args, **kwargs)
         if os.path.exists("song.mid"):
             os.remove("song.mid")
-

@@ -1,17 +1,18 @@
-import json, shutil
+import json
+import shutil
 import cv2
 
-
+# Opens the data file with json
 def open_data(path):
     with open(path) as f:
         return json.load(f)
 
-
+# Returns a list of string numbers as a list of ints
 def string_to_int_array(array):
     desired_array = [int(numeric_string) for numeric_string in array]
     return desired_array
 
-
+# Returns a list of every category in the dataset
 def classes_list(d):
     categories = d['categories']
     keys = categories.keys()
@@ -24,25 +25,7 @@ def classes_list(d):
                 classes.append(class_name)
     return classes
 
-
-def write_classes_to_txt(d):
-    categories = d['categories']
-    keys = categories.keys()
-    int_keys = string_to_int_array(keys)
-    with open('deepscores_classes.txt', 'w') as f:
-        for i in range(0, max(int_keys)):
-            if i in int_keys:
-                if categories[str(i)]['annotation_set'] == "deepscores":
-                    class_name = categories[str(i)]['name']
-                    # print(str(i) + ": " + class_name)
-                    f.write(class_name)
-                    f.write('\n')
-            else:
-                pass
-                f.write('None')
-                f.write('\n')
-
-
+# Formats the yolo bbox correctly
 def yolo_format_bbox(bbox, img_width, img_height):
     # x y width height (relative to image)
     int_bbox = [int(x) for x in bbox]
@@ -64,7 +47,7 @@ def yolo_format_bbox(bbox, img_width, img_height):
         print('Error - Wrong annotation.')
     return relative_bbox
 
-
+# Writes a new dataset given a list of specific annotations to include
 def write_specific_annotations_to_txt(d, cat_list, folder):
     images = d['images']
     # Adds everything into a txt file array
@@ -77,10 +60,13 @@ def write_specific_annotations_to_txt(d, cat_list, folder):
             for ann_id in img["ann_ids"]:
                 cat_id = d['annotations'][ann_id]['cat_id'][0]
                 if cat_id == str(cat):
-                    img_height, img_width = cv2.imread('DeepScoresV2/images/' + file_name).shape
-                    bbox = yolo_format_bbox(d['annotations'][ann_id]['a_bbox'], img_width, img_height)
+                    img_height, img_width = cv2.imread(
+                        'DeepScoresV2/images/' + file_name).shape
+                    bbox = yolo_format_bbox(
+                        d['annotations'][ann_id]['a_bbox'], img_width, img_height)
                     txt_line += str(index) + " "
-                    txt_line += str(bbox).strip('[').strip(']').replace(",", '')
+                    txt_line += str(bbox).strip(
+                        '[').strip(']').replace(",", '')
                     txt_file.append(txt_line)
                     txt_line = ""
             index += 1
@@ -94,24 +80,9 @@ def write_specific_annotations_to_txt(d, cat_list, folder):
                 f.write(line)
                 f.write('\n')
 
-
-def copy_files(files, source_folder, dest_folder):
-    for f in files:
-        shutil.copy(source_folder + "/" + f, dest_folder)
-
-
 data = open_data('DeepScoresV2/deepscores_train.json')
 all_classes = classes_list(data)
-wanted_class = ["staff", "clefG", "clefF", "keyFlat", "keyNatural", "keySharp", "noteheadBlackOnLine", "noteheadBlackInSpace", "noteheadHalfOnLine", "noteheadHalfInSpace", "noteheadWholeOnLine", "noteheadWholeInSpace", "accidentalFlat", "accidentalNatural", "accidentalSharp"]
+wanted_class = ["staff", "noteheadBlackOnLine", "noteheadBlackInSpace", "noteheadHalfOnLine", "noteheadHalfInSpace", "noteheadWholeOnLine", "noteheadWholeInSpace"]
 classes_index = [all_classes.index(x) for x in wanted_class]
-#write_specific_annotations_to_txt(data, classes_index, 'darknet/data/obj')
-print(json.dumps(data['annotations'], indent=4, sort_keys=True))
+write_specific_annotations_to_txt(data, classes_index, 'darknet/obj')
 print('Finished!')
-
-
-
-# dict_keys(['info', 'annotation_sets', 'categories', 'images', 'annotations'])
-# Format for json - 1 0.716797 0.395833 0.216406 0.147222
-# yolo file format - class x y width height (relative to image)
-# <x> = <absolute_x> / <image_width> or <height> = <absolute_height> / <image_height>
-# json file format - xtopleft, ytopleft, xbotright, ybotright

@@ -1,0 +1,7 @@
+staff
+noteheadBlackOnLine
+noteheadBlackInSpace
+noteheadHalfOnLine
+noteheadHalfInSpace
+noteheadWholeOnLine
+noteheadWholeInSpace
