@@ -1,6 +1,6 @@
 # DL5-Music-Detector
 
-This application is able to analyze sheet music, then save and play it using Deep Learning technology (YOLOV3) and PyQt for the interface.
+This application is able to analyze simple sheet music, then save and play it using Deep Learning technology (YOLOV3) and PyQt for the interface.
 
 ![](https://i.imgur.com/HLjsShy.png)
 
